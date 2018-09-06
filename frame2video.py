@@ -3,6 +3,40 @@
 import cv2
 import argparse
 import os
+import re
+
+"""
+Extract the number from file name
+"""
+def cvtStr2Int(imgName):
+    strName = imgName.split(".")[0]
+    # get numbers from file name
+    p = re.compile(r'\d+')
+    numName = p.findall(strName)
+    # Convert it to integer
+    intName = int(numName[0])
+    
+    return intName
+
+"""
+Sort and construct new name
+"""
+def sortFrameName(images):
+    front = 'frame'
+    end = '.jpeg'
+    
+    newImages = []
+    mlist = [cvtStr2Int(i) for i in images]
+    #Sort 
+    mlist.sort()
+    
+    for i in mlist:
+        seq = [front, str(i), end]
+        # Construct the file name
+        newImages.append("".join(seq))
+    
+    return newImages
+
 
 # Construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
@@ -29,6 +63,10 @@ height, width, channels = frame.shape
 # Define the codec and create VideoWriter object
 fourcc = cv2.VideoWriter_fourcc(*'XVID') # fourCC save video as .avi format !!!
 out = cv2.VideoWriter(output, fourcc, 20.0, (width, height))
+
+# Sort frame's name
+images = sortFrameName(images)
+print("Frame files have been sorted")
 
 for image in images:
 
