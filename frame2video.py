@@ -4,48 +4,19 @@ import cv2
 import argparse
 import os
 import re
-
-"""
-Extract the number from file name
-"""
-def cvtStr2Int(imgName):
-    strName = imgName.split(".")[0]
-    # get numbers from file name
-    p = re.compile(r'\d+')
-    numName = p.findall(strName)
-    # Convert it to integer
-    intName = int(numName[0])
-    
-    return intName
-
-"""
-Sort and construct new name
-"""
-def sortFrameName(images):
-    front = 'frame'
-    end = '.jpeg'
-    
-    newImages = []
-    mlist = [cvtStr2Int(i) for i in images]
-    #Sort 
-    mlist.sort()
-    
-    for i in mlist:
-        seq = [front, str(i), end]
-        # Construct the file name
-        newImages.append("".join(seq))
-    
-    return newImages
+from utility import sortFrameName
 
 
 # Construct the argument parser and parse the arguments
 ap = argparse.ArgumentParser()
+ap.add_argument("-p", "--filePath", required=False, default='./', help="where are your files. default is './'")
 ap.add_argument("-ext", "--extension", required=False, default='jpeg', help="extension name. default is 'jpeg'.")
 ap.add_argument("-o", "--output", required=False, default='output.avi', help="output video file")
 args = vars(ap.parse_args())
 
 # Arguments
-dir_path = './video2frame/'
+#dir_path = './video2frame/'
+dir_path = args['filePath']
 ext = args['extension']
 output = args['output']
 
@@ -68,6 +39,7 @@ out = cv2.VideoWriter(output, fourcc, 20.0, (width, height))
 images = sortFrameName(images)
 print("Frame files have been sorted")
 
+# Show frame by frame
 for image in images:
 
     image_path = os.path.join(dir_path, image)
@@ -83,4 +55,4 @@ for image in images:
 out.release()
 cv2.destroyAllWindows()
 
-print("The output video is {}".format(output))
+print("Video {} has been saved".format(output))
